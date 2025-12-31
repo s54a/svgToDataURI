@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SVG → Favicon Data URI</title>
+
+  <!-- DEFAULT FAVICON (ALWAYS PRESENT) -->
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231f2937'/%3E%3Ctext x='50' y='50' font-size='50' fill='%23ffffff' text-anchor='middle' dy='.3em' font-family='Poppins, sans-serif' font-weight='bold'%3ERJ%3C/text%3E%3C/svg%3E"
+  />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --panel: #020617;
+      --card: #020617;
+      --border: #1e293b;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 10% -20%, #020617, transparent),
+                  radial-gradient(1200px 600px at 90% 120%, #020617, transparent),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 6px;
+      letter-spacing: -0.02em;
+    }
+
+    p.sub {
+      color: var(--muted);
+      margin-top: 0;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: linear-gradient(
+        180deg,
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0)
+      );
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset;
+    }
+
+    .card h2 {
+      font-size: 14px;
+      margin: 0 0 10px;
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    textarea, input {
+      width: 100%;
+      background: #020617;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 10px;
+      outline: none;
+      resize: vertical;
+      font-size: 13px;
+    }
+
+    textarea {
+      min-height: 140px;
+      line-height: 1.5;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      background: #020617;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    button.primary {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    button.success {
+      border-color: var(--accent-2);
+      color: var(--accent-2);
+    }
+
+    button.danger {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .output {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .saved {
+      max-height: 220px;
+      overflow-y: auto;
+      font-size: 12px;
+      margin-top: 10px;
+      color: var(--muted);
+    }
+
+    .saved div {
+      padding: 6px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>SVG → Favicon Data URI</h1>
+  <p class="sub">
+    Paste SVG markup, paste from clipboard, or fetch SVG URL.  
+    Output is favicon-ready. Saved locally. Exportable as JSON.
+  </p>
+
+  <div class="grid">
+    <!-- INPUT -->
+    <div class="card">
+      <h2>SVG Input</h2>
+
+      <input
+        id="svgUrl"
+        placeholder="Optional: SVG URL (https://...)"
+      />
+
+      <textarea
+        id="svgInput"
+        placeholder="Paste SVG markup here…"
+      ></textarea>
+
+      <div class="actions">
+        <button class="primary" onclick="convert()">Convert</button>
+        <button onclick="pasteFromClipboard()">Paste from Clipboard</button>
+        <button onclick="fetchFromUrl()">Fetch URL</button>
+        <button class="danger" onclick="clearInput()">Clear</button>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="card">
+      <h2>Favicon Output</h2>
+
+      <textarea
+        id="output"
+        class="output"
+        placeholder="Converted favicon link will appear here…"
+      ></textarea>
+
+      <div class="actions">
+        <button class="success" onclick="copyOutput()">Copy</button>
+        <button onclick="saveEntry()">Save</button>
+        <button onclick="exportJSON()">Export JSON</button>
+        <button class="danger" onclick="clearStorage()">Clear Saved</button>
+      </div>
+
+      <div class="saved" id="savedList"></div>
+    </div>
+  </div>
+
+  <footer>
+    Local only. No network calls except optional SVG fetch.
+  </footer>
+
+  <script>
+    const STORAGE_KEY = "svg_favicon_history";
+
+    function encodeSVG(svg) {
+      return svg
+        .replace(/\s+/g, " ")
+        .replace(/"/g, "'")
+        .replace(/%/g, "%25")
+        .replace(/#/g, "%23")
+        .replace(/</g, "%3C")
+        .replace(/>/g, "%3E")
+        .replace(/\{/g, "%7B")
+        .replace(/\}/g, "%7D")
+        .replace(/\|/g, "%7C")
+        .replace(/\^/g, "%5E")
+        .replace(/`/g, "%60")
+        .replace(/;/g, "%3B")
+        .replace(/\?/g, "%3F")
+        .replace(/:/g, "%3A")
+        .replace(/@/g, "%40")
+        .replace(/=/g, "%3D")
+        .replace(/&/g, "%26");
+    }
+
+    function convert() {
+      const raw = document.getElementById("svgInput").value.trim();
+      if (!raw.startsWith("<svg")) {
+        alert("Invalid SVG markup");
+        return;
+      }
+
+      const encoded = encodeSVG(raw);
+      const link = `<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${encoded}">`;
+
+      document.getElementById("output").value = link;
+    }
+
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById("svgInput").value = text;
+      } catch {
+        alert("Clipboard access denied");
+      }
+    }
+
+    async function fetchFromUrl() {
+      const url = document.getElementById("svgUrl").value.trim();
+      if (!url) return;
+
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        document.getElementById("svgInput").value = text;
+      } catch {
+        alert("Failed to fetch SVG");
+      }
+    }
+
+    function copyOutput() {
+      navigator.clipboard.writeText(
+        document.getElementById("output").value
+      );
+    }
+
+    function saveEntry() {
+      const svg = document.getElementById("svgInput").value;
+      const out = document.getElementById("output").value;
+      if (!svg || !out) return;
+
+      const data = loadStorage();
+      data.push({
+        svg,
+        output: out,
+        ts: new Date().toISOString()
+      });
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      renderSaved();
+    }
+
+    function loadStorage() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    }
+
+    function renderSaved() {
+      const list = document.getElementById("savedList");
+      const data = loadStorage();
+      list.innerHTML = "";
+
+      data.slice().reverse().forEach(item => {
+        const div = document.createElement("div");
+        div.textContent = item.output.slice(0, 120) + "…";
+        list.appendChild(div);
+      });
+    }
+
+    function exportJSON() {
+      const data = loadStorage();
+      const blob = new Blob(
+        [JSON.stringify(data, null, 2)],
+        { type: "application/json" }
+      );
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "svg-favicons.json";
+      a.click();
+    }
+
+    function clearStorage() {
+      localStorage.removeItem(STORAGE_KEY);
+      renderSaved();
+    }
+
+    function clearInput() {
+      document.getElementById("svgInput").value = "";
+      document.getElementById("output").value = "";
+      document.getElementById("svgUrl").value = "";
+    }
+
+    renderSaved();
+  </script>
+
+</body>
+</html>
