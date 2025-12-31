@@ -3,18 +3,39 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SVG to Favicon | Converter</title>
+
+    <title>FaviconGen | Instant SVG to Data URI Converter</title>
+    <meta
+      name="description"
+      content="Convert raw SVG code or URLs into ready-to-use HTML favicon Data URIs instantly. A privacy-first, client-side tool for developers."
+    />
+    <meta
+      name="keywords"
+      content="svg, favicon, generator, data uri, base64, converter, developer tool, vite, typescript"
+    />
+    <meta name="author" content="FaviconGen" />
+
+    <meta property="og:title" content="FaviconGen | SVG to Data URI" />
+    <meta
+      property="og:description"
+      content="Instant client-side SVG to Favicon converter with history and preview."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://favicongen.vercel.app" />
+    <meta name="theme-color" content="#09090b" />
   </head>
-  <body class="flex min-h-screen flex-col">
+  <body
+    class="flex min-h-screen flex-col bg-zinc-950 text-zinc-100 antialiased selection:bg-blue-500/30"
+  >
     <nav
-      class="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-md"
+      class="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md"
     >
       <div
         class="mx-auto flex h-16 max-w-4xl items-center justify-between px-4"
       >
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
           <div
-            class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 shadow-[0_0_15px_-3px_rgba(37,99,235,0.5)]"
+            class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 shadow-[0_0_15px_-3px_rgba(37,99,235,0.5)] ring-1 ring-white/10"
           >
             <svg
               class="h-5 w-5 text-white"
@@ -35,7 +56,7 @@
           >
         </div>
 
-        <div class="flex items-center gap-4 text-sm font-medium text-zinc-400">
+        <div class="flex items-center gap-6 text-sm font-medium text-zinc-400">
           <a href="./claude.html" class="transition-colors hover:text-white">
             Claude Version
           </a>
@@ -45,8 +66,13 @@
           <a
             href="https://github.com"
             target="_blank"
-            class="hidden transition-colors hover:text-white sm:block"
+            class="hidden items-center gap-2 transition-colors hover:text-white sm:flex"
           >
+            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+              />
+            </svg>
             GitHub
           </a>
         </div>
@@ -54,7 +80,7 @@
     </nav>
 
     <main class="mx-auto w-full max-w-4xl flex-1 space-y-8 px-4 py-8">
-      <div class="space-y-2 text-center">
+      <div class="space-y-3 pt-4 text-center">
         <h1 class="text-4xl font-bold tracking-tight text-white sm:text-5xl">
           SVG to
           <span
@@ -62,69 +88,93 @@
             >Data URI</span
           >
         </h1>
-        <p class="mx-auto max-w-lg text-zinc-400">
+        <p class="mx-auto max-w-lg text-lg text-zinc-400">
           Convert raw SVG code or URLs into ready-to-use HTML favicon tags.
         </p>
       </div>
 
       <div class="grid gap-6">
         <div
-          class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-xl backdrop-blur-sm"
+          class="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl shadow-black/50"
         >
-          <div class="mb-4 flex gap-4 border-b border-zinc-800 pb-2">
+          <div class="mb-6 flex gap-6 border-b border-zinc-800">
             <button
               id="tab-code"
-              class="border-b-2 border-blue-500 pb-2 text-sm font-medium text-blue-400 transition-colors"
+              class="border-b-2 border-blue-500 pb-3 text-sm font-medium text-blue-400 transition-colors"
             >
               Paste Code
             </button>
-            <button
+            <!-- <button
               id="tab-url"
-              class="pb-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
+              class="border-b-2 border-transparent pb-3 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
             >
               Fetch URL
-            </button>
+            </button> -->
           </div>
 
-          <div id="input-group-code" class="space-y-3">
-            <textarea
-              id="svgInput"
-              rows="6"
-              class="w-full resize-y rounded-lg border border-zinc-800 bg-zinc-950 p-4 font-mono text-sm text-zinc-300 placeholder-zinc-600 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none"
-              placeholder="<svg ...> or paste existing <link> tag here..."
-            ></textarea>
+          <div id="input-group-code" class="space-y-4">
+            <div class="relative">
+              <textarea
+                id="svgInput"
+                rows="6"
+                class="w-full resize-y rounded-xl border border-zinc-800 bg-zinc-950/50 p-4 font-mono text-sm leading-relaxed text-zinc-300 placeholder-zinc-600 transition-all focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/40 focus:outline-none"
+                placeholder="<svg ...> or paste existing <link> tag here..."
+              ></textarea>
+              <div class="absolute right-3 bottom-3 flex gap-2">
+                <button
+                  id="btnPaste"
+                  class="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
+                >
+                  Paste Clipboard
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div id="input-group-url" class="hidden space-y-3">
+          <div id="input-group-url" class="hidden space-y-4">
             <div class="flex gap-2">
-              <input
-                id="urlInput"
-                type="url"
-                class="flex-1 rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-sm text-zinc-300 placeholder-zinc-600 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none"
-                placeholder="https://www.svgrepo.com/..."
-              />
+              <div class="relative flex-1">
+                <div
+                  class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+                >
+                  <span class="text-zinc-500">🔗</span>
+                </div>
+                <input
+                  id="urlInput"
+                  type="url"
+                  class="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 p-3 pl-10 font-mono text-sm text-zinc-300 placeholder-zinc-600 transition-all focus:border-blue-500/40 focus:ring-2 focus:ring-blue-500/40 focus:outline-none"
+                  placeholder="https://www.svgrepo.com/show/..."
+                />
+              </div>
               <button
                 id="btnFetch"
-                class="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-lg shadow-blue-900/20 transition-colors hover:bg-blue-500"
+                class="rounded-xl bg-blue-600 px-5 py-2 font-medium text-white shadow-lg shadow-blue-900/20 transition-all hover:bg-blue-500 active:scale-95"
               >
                 Fetch
               </button>
             </div>
-            <p class="text-xs text-zinc-500">
-              Note: fetching may fail if the server blocks CORS.
+            <p class="flex items-center gap-1 text-xs text-zinc-500">
+              <svg
+                class="h-3 w-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Uses a CORS proxy to bypass browser restrictions.
             </p>
           </div>
 
-          <div class="mt-4 flex gap-3">
-            <button
-              id="btnPaste"
-              class="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-700"
-            >
-              Paste Clipboard
-            </button>
+          <div class="mt-6 flex justify-end">
             <button
               id="btnGenerate"
-              class="ml-auto rounded-lg bg-white px-4 py-2 text-sm font-bold text-black transition-colors hover:bg-zinc-200"
+              class="w-full rounded-xl bg-zinc-100 px-6 py-2.5 text-sm font-bold text-zinc-900 shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)] transition-all hover:bg-white active:scale-95 sm:w-auto"
             >
               Process & Save
             </button>
@@ -132,74 +182,98 @@
         </div>
 
         <div
-          class="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-xl"
+          class="group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-xl"
         >
-          <div
-            class="pointer-events-none absolute top-0 right-0 p-6 opacity-10"
+          <!-- <div
+            class="pointer-events-none absolute top-0 right-0 p-8 opacity-5 transition-opacity group-hover:opacity-10"
           >
-            <svg class="h-32 w-32" fill="currentColor" viewBox="0 0 24 24">
+            <svg class="h-40 w-40" fill="currentColor" viewBox="0 0 24 24">
               <path
                 d="M12 2L2 7l10 5 10-5-10-5zm0 9l2-1-9-4.5L5.5 10 12 11zm0 0l-2-1 9-4.5L18.5 10 12 11zM2 17l10 5 10-5M2 12l10 5 10-5"
               />
             </svg>
-          </div>
+          </div> -->
 
-          <div class="mb-6 flex items-start gap-6">
+          <div class="relative z-10 mb-6 flex items-start gap-6">
             <div
-              class="flex h-16 w-16 items-center justify-center rounded-xl border border-zinc-700 bg-zinc-800 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] p-2 shadow-inner"
+              class="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border-2 border-zinc-700 bg-white shadow-lg"
             >
               <div
-                class="flex h-full w-full items-center justify-center overflow-hidden rounded bg-white/10 backdrop-blur-sm"
+                class="absolute inset-0 opacity-20"
+                style="
+                  background-image:
+                    linear-gradient(45deg, #000 25%, transparent 25%),
+                    linear-gradient(-45deg, #000 25%, transparent 25%),
+                    linear-gradient(45deg, transparent 75%, #000 75%),
+                    linear-gradient(-45deg, transparent 75%, #000 75%);
+                  background-size: 10px 10px;
+                  background-position:
+                    0 0,
+                    0 5px,
+                    5px -5px,
+                    -5px 0px;
+                "
+              ></div>
+
+              <div
+                class="relative flex h-full w-full items-center justify-center p-3"
               >
                 <img
                   id="previewImg"
                   src=""
-                  alt=""
-                  class="h-full w-full object-contain"
+                  alt="Favicon"
+                  class="h-full w-full object-contain drop-shadow-sm"
                 />
               </div>
             </div>
-            <div>
-              <h3 class="text-lg font-semibold text-white">Preview</h3>
-              <p class="text-sm text-zinc-500">Favicon rendering output</p>
+
+            <div class="pt-1">
+              <h3 class="mb-1 text-xl font-bold text-white">Preview</h3>
+              <p class="text-sm text-zinc-400">
+                This is how your favicon will render. <br />The checkerboard
+                indicates transparency.
+              </p>
             </div>
           </div>
 
-          <div class="space-y-2">
+          <div class="relative z-10 space-y-2">
             <label
-              class="text-xs font-semibold tracking-wider text-zinc-500 uppercase"
+              class="text-xs font-bold tracking-wider text-zinc-500 uppercase"
               >Generated HTML Tag</label
             >
-            <div class="group relative">
+            <div class="relative">
               <textarea
                 id="outputCode"
                 readonly
-                rows="3"
-                class="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 pr-24 font-mono text-xs text-blue-300 focus:border-zinc-700 focus:outline-none"
+                rows="7"
+                class="w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 p-4 font-mono text-xs text-blue-300 selection:bg-blue-900/50 focus:border-zinc-600 focus:outline-none"
+                spellcheck="false"
               ></textarea>
-              <button
-                id="btnCopy"
-                class="absolute top-2 right-2 rounded border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs text-white transition-colors hover:bg-zinc-700"
-              >
-                Copy
-              </button>
             </div>
+            <button
+              id="btnCopy"
+              class="absolute top-2 right-2 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
+            >
+              Copy Code
+            </button>
           </div>
         </div>
 
-        <div class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6">
+        <div class="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
           <div class="mb-4 flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-white">Local History</h3>
+            <h3 class="text-sm font-bold tracking-wide text-zinc-100 uppercase">
+              Session History
+            </h3>
             <div class="flex gap-2">
               <button
                 id="btnExport"
-                class="rounded border border-zinc-800 px-2 py-1 text-xs text-zinc-400 transition-colors hover:border-zinc-600 hover:text-white"
+                class="rounded-lg border border-transparent bg-zinc-800/50 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
               >
                 Export JSON
               </button>
               <button
                 id="btnClear"
-                class="rounded border border-zinc-800 px-2 py-1 text-xs text-red-400 transition-colors hover:border-red-900/50 hover:text-red-300"
+                class="rounded-lg border border-transparent bg-red-900/10 px-3 py-1.5 text-xs text-red-400 transition-colors hover:border-red-900/30 hover:bg-red-900/20 hover:text-red-300"
               >
                 Clear
               </button>

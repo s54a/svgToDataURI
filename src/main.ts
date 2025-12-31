@@ -12,6 +12,8 @@ interface HistoryItem {
 const DEFAULT_SVG_HREF =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231f2937'/%3E%3Ctext x='50' y='50' font-size='50' fill='%23ffffff' text-anchor='middle' dy='.3em' font-family='Poppins, sans-serif' font-weight='bold'%3ERJ%3C/text%3E%3C/svg%3E";
 const STORAGE_KEY = "favicon_history_v1";
+// We use a public proxy to bypass CORS restrictions on client-side
+const CORS_PROXY = "https://api.allorigins.win/raw?url=";
 
 // --- DOM Elements ---
 const els = {
@@ -99,29 +101,42 @@ const processInput = () => {
 
 const fetchUrl = async () => {
   const url = els.urlInput.value.trim();
-  if (!url) return;
+  if (!url) {
+    alert("Please enter a URL first.");
+    return;
+  }
 
+  const originalText = els.btnFetch.innerText;
   els.btnFetch.innerText = "Fetching...";
+  els.btnFetch.disabled = true;
 
   try {
-    const res = await fetch(url);
+    // Use the proxy to avoid CORS errors
+    const targetUrl = CORS_PROXY + encodeURIComponent(url);
+    const res = await fetch(targetUrl);
+
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
 
-    // Check if it looks like SVG
-    if (!text.includes("<svg")) throw new Error("Not a valid SVG file");
+    // Simple validation
+    if (!text.toLowerCase().includes("<svg")) {
+      throw new Error("The URL did not return a valid SVG.");
+    }
 
     els.svgInput.value = text;
     processInput();
-    switchTab("code"); // Switch back to code view to show result
-    alert("SVG fetched successfully!");
-  } catch (err) {
+    saveHistory(); // Auto-save on successful fetch
+
+    // UX: Switch tabs automatically
+    switchTab("code");
+  } catch (err: any) {
     console.error(err);
     alert(
-      "Failed to fetch SVG. CORS might be blocking this request. Try downloading the file and pasting the code.",
+      `Error: ${err.message || "Failed to fetch SVG"}. Ensure the URL points directly to an .svg file.`,
     );
   } finally {
-    els.btnFetch.innerText = "Fetch";
+    els.btnFetch.innerText = originalText;
+    els.btnFetch.disabled = false;
   }
 };
 
@@ -138,6 +153,10 @@ const saveHistory = () => {
   };
 
   const history = getHistory();
+
+  // Prevent duplicate consecutive saves
+  if (history.length > 0 && history[0].svg === currentSvg) return;
+
   history.unshift(entry);
   if (history.length > 50) history.pop(); // Max 50 items
 
@@ -159,7 +178,7 @@ const renderHistory = () => {
 
   if (history.length === 0) {
     els.historyList.innerHTML =
-      '<div class="text-zinc-600 text-center text-sm py-4">No history yet.</div>';
+      '<div class="text-zinc-600 text-center text-xs py-8 italic">No history yet. Generate some favicons!</div>';
     return;
   }
 
@@ -168,47 +187,63 @@ const renderHistory = () => {
     div.className =
       "bg-zinc-950 border border-zinc-800 p-3 rounded-lg flex justify-between items-center group hover:border-zinc-700 transition-colors";
 
+    // Create a tiny text snippet
     const snippet = item.svg.substring(0, 40).replace(/</g, "&lt;") + "...";
 
     div.innerHTML = `
-      <div class="overflow-hidden">
-        <div class="text-xs text-blue-500 mb-0.5">${item.date}</div>
-        <div class="text-xs text-zinc-400 font-mono truncate" title="Click to load">${snippet}</div>
+      <div class="overflow-hidden cursor-pointer flex-1" onclick="document.dispatchEvent(new CustomEvent('loadHistory', {detail: ${item.id}}))">
+        <div class="text-[10px] text-blue-500 mb-0.5 font-mono">${item.date}</div>
+        <div class="text-xs text-zinc-400 font-mono truncate hover:text-zinc-200 transition-colors" title="Click to load">${snippet}</div>
       </div>
       <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button class="load-btn px-2 py-1 bg-zinc-800 hover:bg-zinc-700 rounded text-xs text-white" data-id="${item.id}">Load</button>
+         <button class="copy-hist-btn px-2 py-1 bg-zinc-800 hover:bg-zinc-700 rounded text-xs text-zinc-300 border border-zinc-700" data-code="${encodeURIComponent(item.code)}">Copy</button>
       </div>
     `;
-
-    // Attach event listener specifically for the load button
-    const loadBtn = div.querySelector(".load-btn") as HTMLButtonElement;
-    loadBtn.onclick = () => {
-      els.svgInput.value = item.svg;
-      processInput();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    };
-
     els.historyList.appendChild(div);
   });
+
+  // Re-attach listeners for dynamically created buttons
+  document.querySelectorAll(".copy-hist-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const target = e.target as HTMLButtonElement;
+      const code = decodeURIComponent(target.dataset.code || "");
+      navigator.clipboard.writeText(code);
+      const original = target.innerText;
+      target.innerText = "Copied";
+      setTimeout(() => (target.innerText = original), 1000);
+    });
+  });
 };
+
+// Custom event listener for history items (cleaner than inline onclick)
+document.addEventListener("loadHistory", (e: any) => {
+  const id = e.detail;
+  const history = getHistory();
+  const item = history.find((x) => x.id === id);
+  if (item) {
+    els.svgInput.value = item.svg;
+    processInput();
+    switchTab("code");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
 
 const switchTab = (tab: "code" | "url") => {
   if (tab === "code") {
     els.tabCode.classList.replace("text-zinc-400", "text-blue-400");
-    els.tabCode.classList.replace("border-transparent", "border-blue-500"); // Add active border
-    els.tabCode.classList.add("border-b-2");
+    els.tabCode.classList.replace("border-transparent", "border-blue-500");
 
     els.tabUrl.classList.replace("text-blue-400", "text-zinc-400");
-    els.tabUrl.classList.remove("border-b-2", "border-blue-500");
+    els.tabUrl.classList.replace("border-blue-500", "border-transparent");
 
     els.groupCode.classList.remove("hidden");
     els.groupUrl.classList.add("hidden");
   } else {
     els.tabUrl.classList.replace("text-zinc-400", "text-blue-400");
-    els.tabUrl.classList.add("border-b-2", "border-blue-500");
+    els.tabUrl.classList.replace("border-transparent", "border-blue-500");
 
     els.tabCode.classList.replace("text-blue-400", "text-zinc-400");
-    els.tabCode.classList.remove("border-b-2", "border-blue-500");
+    els.tabCode.classList.replace("border-blue-500", "border-transparent");
 
     els.groupUrl.classList.remove("hidden");
     els.groupCode.classList.add("hidden");
@@ -225,7 +260,7 @@ const setupListeners = () => {
       els.svgInput.value = text;
       processInput();
     } catch {
-      alert("Clipboard permission denied");
+      alert("Clipboard permission denied. Please paste manually (Ctrl+V).");
     }
   });
 
@@ -249,7 +284,7 @@ const setupListeners = () => {
   els.tabUrl.addEventListener("click", () => switchTab("url"));
 
   els.btnClear.addEventListener("click", () => {
-    if (confirm("Clear history?")) {
+    if (confirm("Delete all history items?")) {
       localStorage.removeItem(STORAGE_KEY);
       renderHistory();
     }
