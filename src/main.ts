@@ -10,7 +10,7 @@ interface HistoryItem {
 
 // --- Constants ---
 const DEFAULT_SVG_HREF =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231f2937'/%3E%3Ctext x='50' y='50' font-size='50' fill='%23ffffff' text-anchor='middle' dy='.3em' font-family='Poppins, sans-serif' font-weight='bold'%3ERJ%3C/text%3E%3C/svg%3E";
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23000000'/%3E%3Ctext x='50' y='50' font-size='50' fill='%23ffffff' text-anchor='middle' dy='.3em' font-family='Poppins, sans-serif' font-weight='bold'%3ESG%3C/text%3E%3C/svg%3E";
 const STORAGE_KEY = "favicon_history_v1";
 // We use a public proxy to bypass CORS restrictions on client-side
 const CORS_PROXY = "https://api.allorigins.win/raw?url=";
@@ -33,7 +33,7 @@ const els = {
 
   // Tabs
   tabCode: document.getElementById("tab-code") as HTMLButtonElement,
-  tabUrl: document.getElementById("tab-url") as HTMLButtonElement,
+  // tabUrl: document.getElementById("tab-url") as HTMLButtonElement,
   groupCode: document.getElementById("input-group-code") as HTMLDivElement,
   groupUrl: document.getElementById("input-group-url") as HTMLDivElement,
 };
@@ -90,13 +90,13 @@ const processInput = () => {
   els.previewImg.src = dataUri;
 
   // Update browser favicon dynamically
-  let pageLink = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
-  if (!pageLink) {
-    pageLink = document.createElement("link");
-    pageLink.rel = "icon";
-    document.head.appendChild(pageLink);
-  }
-  pageLink.href = dataUri;
+  // let pageLink = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+  // if (!pageLink) {
+  //   pageLink = document.createElement("link");
+  //   pageLink.rel = "icon";
+  //   document.head.appendChild(pageLink);
+  // }
+  // pageLink.href = dataUri;
 };
 
 const fetchUrl = async () => {
@@ -233,14 +233,14 @@ const switchTab = (tab: "code" | "url") => {
     els.tabCode.classList.replace("text-zinc-400", "text-blue-400");
     els.tabCode.classList.replace("border-transparent", "border-blue-500");
 
-    els.tabUrl.classList.replace("text-blue-400", "text-zinc-400");
-    els.tabUrl.classList.replace("border-blue-500", "border-transparent");
+    // els.tabUrl.classList.replace("text-blue-400", "text-zinc-400");
+    // els.tabUrl.classList.replace("border-blue-500", "border-transparent");
 
     els.groupCode.classList.remove("hidden");
     els.groupUrl.classList.add("hidden");
   } else {
-    els.tabUrl.classList.replace("text-zinc-400", "text-blue-400");
-    els.tabUrl.classList.replace("border-transparent", "border-blue-500");
+    // els.tabUrl.classList.replace("text-zinc-400", "text-blue-400");
+    // els.tabUrl.classList.replace("border-transparent", "border-blue-500");
 
     els.tabCode.classList.replace("text-blue-400", "text-zinc-400");
     els.tabCode.classList.replace("border-blue-500", "border-transparent");
@@ -281,7 +281,7 @@ const setupListeners = () => {
   els.btnFetch.addEventListener("click", fetchUrl);
 
   els.tabCode.addEventListener("click", () => switchTab("code"));
-  els.tabUrl.addEventListener("click", () => switchTab("url"));
+  // els.tabUrl.addEventListener("click", () => switchTab("url"));
 
   els.btnClear.addEventListener("click", () => {
     if (confirm("Delete all history items?")) {
